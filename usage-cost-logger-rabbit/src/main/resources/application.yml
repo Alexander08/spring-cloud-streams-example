@@ -1,0 +1,36 @@
+spring:
+  cloud:
+    stream:
+      defaultBinder: rabbit
+      function:
+        definition: process;
+      bindings:
+        process-in-0:
+          destination: usage-cost
+          group: logger
+      binders:
+        rabbit:
+          type: rabbit
+          environment:
+            spring:
+              rabbitmq:
+                username: guest
+                password: guest
+                host: rabbitmq
+                virtualHost: rabbitmq
+      rabbit:
+        default:
+          consumer:
+            autoBindDlq: true
+            republishToDlq: true
+            transacted: true
+          producer:
+            autoBindDlq: true
+            republishToDlq: true
+            transacted: true
+
+  rabbitmq:
+    username: ${spring.cloud.stream.binders.rabbit.environment.spring.rabbitmq.username}
+    password: ${spring.cloud.stream.binders.rabbit.environment.spring.rabbitmq.password}
+    host: ${spring.cloud.stream.binders.rabbit.environment.spring.rabbitmq.host}
+    virtualHost: ${spring.cloud.stream.binders.rabbit.environment.spring.rabbitmq.virtualHost}

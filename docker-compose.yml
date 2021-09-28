@@ -1,0 +1,46 @@
+version: "3.9"
+
+services:
+  rabbitmq:
+    build: ./rabbitmq
+    container_name: rabbitmq
+    hostname: rabbitmq
+    ports:
+      - 15672:15672
+      - 5672:5672
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
+      - RABBITMQ_DEFAULT_VHOST=rabbitmq
+
+  usage-cost-logger-rabbit:
+    build: ./usage-cost-logger-rabbit
+    container_name: usage-cost-logger-rabbit
+    ports:
+      - 8080:8080
+    depends_on:
+      - "rabbitmq"
+      - "usage-cost-processor-rabbit"
+    links:
+      - "rabbitmq:rabbitmq"
+
+  usage-cost-processor-rabbit:
+    build: ./usage-cost-processor-rabbit
+    container_name: usage-cost-processor-rabbit
+    ports:
+      - 8082:8080
+    depends_on:
+      - "rabbitmq"
+      - "usage-detail-sender-rabbit"
+    links:
+      - "rabbitmq:rabbitmq"
+
+  usage-detail-sender-rabbit:
+    build: ./usage-detail-sender-rabbit
+    container_name: usage-detail-sender-rabbit
+    ports:
+      - 8081:8080
+    depends_on:
+      - "rabbitmq"
+    links:
+      - "rabbitmq:rabbitmq"

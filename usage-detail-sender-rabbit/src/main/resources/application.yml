@@ -1,0 +1,48 @@
+
+spring:
+  cloud:
+    stream:
+      poller:
+        fixed-delay: 9000
+      defaultBinder: rabbit
+      function:
+        definition: usageDetailSupplierFlux;usageDetailSupplier;
+      bindings:
+        usageDetail-out-0:
+          destination: usage-detail
+          producer:
+            requiredGroups: usage-cost-consumer
+        usageDetailSupplier-out-0:
+          destination: usage-detail
+          producer:
+            requiredGroups: usage-cost-consumer
+        usageDetailSupplierFlux-out-0:
+          destination: usage-detail
+          producer:
+            requiredGroups: usage-cost-consumer
+      binders:
+        rabbit:
+          type: rabbit
+          environment:
+            spring:
+              rabbitmq:
+                username: guest
+                password: guest
+                host: rabbitmq
+                virtualHost: rabbitmq
+      rabbit:
+        default:
+          consumer:
+            autoBindDlq: true
+            republishToDlq: true
+            transacted: true
+          producer:
+            autoBindDlq: true
+            republishToDlq: true
+            transacted: true
+
+  rabbitmq:
+    username: ${spring.cloud.stream.binders.rabbit.environment.spring.rabbitmq.username}
+    password: ${spring.cloud.stream.binders.rabbit.environment.spring.rabbitmq.password}
+    host: ${spring.cloud.stream.binders.rabbit.environment.spring.rabbitmq.host}
+    virtualHost: ${spring.cloud.stream.binders.rabbit.environment.spring.rabbitmq.virtualHost}
